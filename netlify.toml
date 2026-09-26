@@ -1,0 +1,5 @@
+[build]
+  publish = "preview-dist"
+
+[build.processing]
+  skip_processing = true

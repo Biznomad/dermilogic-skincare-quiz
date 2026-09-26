@@ -1,0 +1,12 @@
+data/
+__pycache__/
+tests/__pycache__/
+test-results/
+.netlify/
+preview-dist/
+generated-matches.js
+.env
+.env.*
+*.sqlite3
+*.sqlite3-*
+.DS_Store

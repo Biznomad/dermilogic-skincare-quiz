@@ -1,0 +1,69 @@
+{% comment %}
+  Dermilogic concern-first skincare quiz. Install on an unpublished theme first.
+  Source: build_shopify.py + public/app.js + skincare.py. See HANDOFF.md.
+{% endcomment %}
+<dermilogic-skin-quiz id="DermilogicQuiz-{{ section.id }}">
+  <template>
+    <link rel="stylesheet" href="{{ 'dermilogic-skin-quiz.css' | asset_url }}">
+    <!-- QUIZ_CONTENT -->
+    <slot></slot>
+  </template>
+  {% assign cleanser = section.settings.cleanser_product %}
+  {% assign patches = section.settings.patch_product %}
+  <div hidden data-product="cleanser" data-title="{{ cleanser.title | escape }}" data-url="{{ cleanser.url | escape }}" data-available="{{ cleanser.available }}" data-description="{{ section.settings.cleanser_description | escape }}" data-image="{% if cleanser.featured_image %}{{ cleanser.featured_image | image_url: width: 800 }}{% endif %}"></div>
+  <div hidden data-product="patches" data-title="{{ patches.title | escape }}" data-url="{{ patches.url | escape }}" data-available="{{ patches.available }}" data-description="{{ section.settings.patch_description | escape }}" data-image="{% if patches.featured_image %}{{ patches.featured_image | image_url: width: 800 }}{% endif %}"></div>
+  {% if section.settings.enable_signup %}
+    {% assign form_id = 'DermilogicSignup-' | append: section.id %}
+    <div class="dl-skin-quiz-signup" data-newsletter hidden>
+      <h2>{{ section.settings.signup_heading | escape }}</h2>
+      <p>Results are yours to use without subscribing. Join only if you want skincare tips and product news.</p>
+      {% form 'customer', id: form_id %}
+        <input type="hidden" name="contact[tags]" value="newsletter,dermilogic-skin-quiz">
+        {% if form.posted_successfully? %}
+          <p role="status" data-form-result>Your signup was received. Check your inbox for any confirmation required by this store.</p>
+        {% else %}
+          {% if form.errors %}<div role="alert" data-form-result>{{ form.errors | default_errors }}</div>{% endif %}
+          <label for="DermilogicEmail-{{ section.id }}">Email address</label>
+          <input id="DermilogicEmail-{{ section.id }}" type="email" name="contact[email]" value="{{ form.email | escape }}" autocomplete="email" required>
+          <label class="dl-skin-quiz-consent" for="DermilogicConsent-{{ section.id }}">
+            <input id="DermilogicConsent-{{ section.id }}" type="checkbox" name="contact[accepts_marketing]" value="true" required>
+            <span>{{ section.settings.consent_copy | escape }}</span>
+          </label>
+          {% if shop.privacy_policy.url != blank %}<a href="{{ shop.privacy_policy.url }}">Privacy policy</a>{% endif %}
+          <button type="submit">Join the email list</button>
+        {% endif %}
+      {% endform %}
+    </div>
+  {% endif %}
+  <noscript><p>Enable JavaScript to use the skincare quiz. You can also <a href="{{ routes.all_products_collection_url }}">browse the store</a>.</p></noscript>
+</dermilogic-skin-quiz>
+<script src="{{ 'dermilogic-skin-quiz.js' | asset_url }}" defer></script>
+{% stylesheet %}
+  .dl-skin-quiz-signup { max-width: 640px; margin: 32px auto; padding: 24px; border: 1px solid #c9d9d5; border-radius: 8px; }
+  .dl-skin-quiz-signup[hidden] { display: none; }
+  .dl-skin-quiz-signup input[type="email"] { display: block; width: 100%; padding: 14px; margin: 8px 0 20px; }
+  .dl-skin-quiz-consent { display: flex; gap: 12px; margin: 20px 0; }
+  .dl-skin-quiz-signup button { display: block; padding: 14px 24px; background: #14665e; color: white; border: 0; margin-top: 20px; cursor: pointer; }
+{% endstylesheet %}
+{% schema %}
+{
+  "name": "Dermilogic skincare quiz",
+  "tag": "section",
+  "limit": 1,
+  "enabled_on": { "templates": ["page", "index"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your skin. A clearer direction." },
+    { "type": "textarea", "id": "intro", "label": "Introduction", "default": "Breakouts, dry-feeling skin, or simply too much advice? Tell us what’s on your mind. Leave with a practical routine and products that have a reason to be there." },
+    { "type": "text", "id": "button_label", "label": "Start button", "default": "Find my routine" },
+    { "type": "image_picker", "id": "hero_image", "label": "Skincare lifestyle image" },
+    { "type": "product", "id": "cleanser_product", "label": "Gentle cleanser product" },
+    { "type": "textarea", "id": "cleanser_description", "label": "Why this cleanser fits", "default": "A fragrance-free cleanser option for the cleansing step. Review the ingredients and introduce it gradually; individual tolerance varies." },
+    { "type": "product", "id": "patch_product", "label": "Hydrocolloid patch product" },
+    { "type": "textarea", "id": "patch_description", "label": "Why these patches fit", "default": "An optional hydrocolloid cover for an occasional surface spot. It will not treat deep, painful, or persistent acne." },
+    { "type": "checkbox", "id": "enable_signup", "label": "Enable optional newsletter signup", "default": false, "info": "Enable after testing the store’s customer form and confirming consent copy. Skin answers are not submitted." },
+    { "type": "text", "id": "signup_heading", "label": "Signup heading", "default": "Keep your skincare simple." },
+    { "type": "textarea", "id": "consent_copy", "label": "Email consent copy", "default": "Yes, send me Dermilogic skincare tips and product offers by email. I can unsubscribe at any time." }
+  ],
+  "presets": [{ "name": "Dermilogic skincare quiz" }]
+}
+{% endschema %}
