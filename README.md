@@ -6,7 +6,7 @@ Start with **HANDOFF.md** for installation, editing, data behavior, and release 
 
 ## What changed
 
-The five-question quiz covers skin concerns, skin feel, sensitivity, the current routine, and sunscreen habits. Results lead with practical skincare guidance and explain the product suggestion. Professional-guidance paths do not show product sales or an email gate. No routine recommends a brush by default.
+The five-question quiz covers skin concerns, skin feel, sensitivity, the current routine, and sunscreen habits. Results lead with practical skincare guidance and explain the product suggestion. Professional-guidance paths do not show product sales or an email gate. No routine recommends a brush by default. Answers auto-advance, and results include an editable product selection with prices, a subtotal, and a cart action.
 
 ## Three environments
 
@@ -21,6 +21,7 @@ Questions: `public/app.js`. Rules and result copy: `skincare.py`. Styling: `publ
 ```sh
 python3 build_preview.py
 python3 build_shopify.py
+python3 package_handoff.py
 python3 -m unittest discover -s tests -q
 python3 tests/browser_smoke.py
 python3 tests/shopify_smoke.py

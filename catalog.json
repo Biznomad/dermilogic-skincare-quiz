@@ -1,0 +1,49 @@
+{
+  "checked_at": "2026-09-26T01:10:05.039675+00:00",
+  "items": {
+    "cleanser": {
+      "kind": "cleanser",
+      "title": "The Reset Cleanser",
+      "variant_label": "",
+      "variant_id": "41350654361733",
+      "price": 1499,
+      "available": true,
+      "image": "https://cdn.shopify.com/s/files/1/0573/8679/5141/files/5_195d0a0b-b9bb-46b6-a466-fea2a0c8a66c.jpg?v=1776789580",
+      "url": "https://dermilogic.com/products/the-reset-cleanser",
+      "currency": "USD"
+    },
+    "patches": {
+      "kind": "patches",
+      "title": "Pimple Rescue Patches",
+      "variant_label": "32 patches",
+      "variant_id": "41585068605573",
+      "price": 999,
+      "available": true,
+      "image": "https://cdn.shopify.com/s/files/1/0573/8679/5141/files/dl-patch-real-creator.jpg?v=1789329677",
+      "url": "https://dermilogic.com/products/pimple-rescue-patch",
+      "currency": "USD"
+    },
+    "towels": {
+      "kind": "towels",
+      "title": "The Reset Towels",
+      "variant_label": "",
+      "variant_id": "41563958706309",
+      "price": 1499,
+      "available": true,
+      "image": "https://cdn.shopify.com/s/files/1/0573/8679/5141/files/dl-towel-box-open-crop.jpg?v=1789641732",
+      "url": "https://dermilogic.com/products/disposable-face-towels",
+      "currency": "USD"
+    },
+    "bands": {
+      "kind": "bands",
+      "title": "No-Drip Wash Bands",
+      "variant_label": "White",
+      "variant_id": "41445250924677",
+      "price": 999,
+      "available": true,
+      "image": "https://cdn.shopify.com/s/files/1/0573/8679/5141/files/81C51B81-F5C5-4F6C-BEEE-3CE780400F14.png?v=1776786009",
+      "url": "https://dermilogic.com/products/no-drip-wash-bands",
+      "currency": "USD"
+    }
+  }
+}

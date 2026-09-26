@@ -42,12 +42,24 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(result['care'],care)
             if care:
                 self.assertEqual(result['shop'],'https://find-a-derm.aad.org/')
+                self.assertEqual(result['bundle'],[])
             else:
                 self.assertNotIn('brush',result['shop'])
+                self.assertGreaterEqual(len(result['bundle']),2)
+                self.assertEqual(len({p['variant_id'] for p in result['bundle']}),len(result['bundle']))
+                self.assertTrue(all(p['price']>0 and p['reason'] for p in result['bundle']))
                 self.assertEqual(len(result['steps']),3)
                 self.assertIn('Moisturizer and sunscreen',result['gap'])
             self.assertIn('SPF 30',result['steps'][2][1])
             if answers['sensitivity']=='reactive': self.assertNotEqual(result['name'],'Pimple Rescue Patches')
+
+    def test_bundle_changes_with_answers(self):
+        baseline=dict(self.payload['answers'])
+        self.assertEqual([p['kind'] for p in recommend(baseline)['bundle']],['cleanser','patches'])
+        self.assertEqual([p['kind'] for p in recommend(dict(baseline,routine='starting'))['bundle']],['cleanser','patches','towels'])
+        self.assertEqual([p['kind'] for p in recommend(dict(baseline,sensitivity='reactive'))['bundle']],['cleanser','towels'])
+        self.assertEqual([p['kind'] for p in recommend(dict(baseline,routine='actives'))['bundle']],['cleanser','towels'])
+        self.assertEqual([p['kind'] for p in recommend(dict(baseline,concern='simple',routine='starting'))['bundle']],['cleanser','bands'])
 
     def test_capture_dedup_and_consent_history(self):
         self.assertEqual(self.request('/api/leads',self.payload)[0],200)

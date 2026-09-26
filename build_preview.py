@@ -44,6 +44,6 @@ engine='window.DermilogicMatches = (() => { const fields='+json.dumps(fields)+';
   X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
-  Content-Security-Policy: default-src 'self'; img-src 'self' https://dermilogic.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; img-src 'self' https://dermilogic.com https://cdn.shopify.com; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'
 ''')
 print('Built browser-only review preview: 8 public files; no customer database.')

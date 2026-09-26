@@ -50,9 +50,29 @@ app=app.replace("$('result-image').src=`https://dermilogic.com/cdn/shop/files/${
 app=app.replace("$('result-image-wrap').hidden=match.care;", "$('result-image-wrap').hidden=match.care||!match.fullImage;")
 app=app.replace("$('shop-link').href=match.shop;", "$('shop-link').hidden=!match.care&&!match.available; $('shop-link').href=match.shop||'#';")
 app=app.replace("saved?'Saved in this local preview. No email has been sent.':'Your results are ready. No email was saved.'", "'Your results are ready. No email needed.'")
-start=app.index("document.querySelectorAll('.shop-link')")
-app=app[:start]+"""$('restart').onclick=()=>{step=0;answers={};match=null;saved=false;const signup=host.querySelector('[data-newsletter]');if(signup)signup.hidden=true;show('intro','start');};
+app=re.sub(r"document.querySelectorAll\('\.shop-link'\).*?;\n", '',app)
+app=re.sub(r"\$\('restart'\)\.onclick=.*?;\n", "$('restart').onclick=()=>{clearTimeout(advanceTimer);revision++;advancing=false;step=0;answers={};match=null;saved=false;const signup=host.querySelector('[data-newsletter]');if(signup)signup.hidden=true;show('intro','start');};\n", app)
+app=app.replace("function resolveBundleItem(item){return {...item};}", """function resolveBundleItem(item){
+ const product=host.querySelector('[data-product="'+item.kind+'"]');const data=product?.dataset||{};
+ return {...item,reason:data.description||item.reason,title:data.title||item.title,variant_label:data.variantLabel||'',variant_id:data.variantId||'',price:Number(data.price),available:data.available==='true',image:data.image||'',url:data.url||''};
+}""")
+app=app.replace("function bundleCurrency(){return 'USD';}","function bundleCurrency(){return host.dataset.currency||'USD';}")
+app=app.replace("$('bundle-action').textContent='Review selected items in store ↗';", "$('bundle-action').textContent='Add selected items to cart';")
+start=app.index("$('bundle-action').onclick=")
+app=app[:start]+"""$('bundle-action').onclick=async()=>{
+ const items=selectedBundle();if(!items.length||$('bundle-action').disabled)return;
+ $('bundle-action').disabled=true;$('bundle-action').textContent='Adding to your cart…';$('bundle-message').textContent='';
+ bundleRows.forEach(row=>row.input.disabled=true);
+ try{
+  const rootPath=host.dataset.root||'/';const base=rootPath.endsWith('/')?rootPath:rootPath+'/';
+  const response=await fetch(base+'cart/add.js',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:items.map(item=>({id:item.variant_id,quantity:1}))})});
+  if(!response.ok){let error;try{error=await response.json();}catch{}throw Error(error?.description||'The store could not add your selection. Check your cart before trying again.');}
+  window.location.assign(host.dataset.cartUrl||base+'cart');
+ }catch(error){$('bundle-message').textContent=error.message||'Check your cart before trying again.';$('bundle-action').disabled=false;$('bundle-action').textContent='Add selected items to cart';bundleRows.forEach(row=>row.input.disabled=!row.available);}
+};
 """
+main=main.replace('One-time items at individual prices; no bundle discount is applied. Preview prices are a catalog snapshot. The store confirms current prices and stock.','One-time items at individual prices; no bundle discount is applied. Final price and availability are confirmed by the cart.')
+
 engine=(ROOT/'generated-matches.js').read_text()
 runtime=engine+"\nif(!customElements.get('dermilogic-skin-quiz'))customElements.define('dermilogic-skin-quiz',class extends HTMLElement { connectedCallback(){if(this.shadowRoot)return;\n"+app+"\n}});\n"
 (out/'assets/dermilogic-skin-quiz.js').write_text(runtime)

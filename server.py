@@ -56,7 +56,7 @@ def create_server(db_path, port=8891):
             self.send_header('Cache-Control', 'no-store')
             self.send_header('X-Content-Type-Options', 'nosniff')
             self.send_header('Referrer-Policy', 'no-referrer')
-            self.send_header('Content-Security-Policy', "default-src 'self'; img-src 'self' https://dermilogic.com; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+            self.send_header('Content-Security-Policy', "default-src 'self'; img-src 'self' https://dermilogic.com https://cdn.shopify.com; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
             if download: self.send_header('Content-Disposition', 'attachment; filename="dermilogic-preview-leads.csv"')
             self.end_headers()
             self.wfile.write(body)

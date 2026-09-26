@@ -1,4 +1,8 @@
 """Concern-first educational routing. Not a diagnosis or treatment plan."""
+import json
+from pathlib import Path
+CATALOG = json.loads((Path(__file__).parent/'catalog.json').read_text())
+
 OPTIONS = {'concern': {'spots','dryness','tone','simple','painful'}, 'feel': {'dry','oily','combination','balanced','unsure'}, 'sensitivity': {'comfortable','reactive','irritated'}, 'routine': {'starting','basic','actives','prescribed'}, 'spf': {'daily','sometimes','none'}}
 
 def recommend(a):
@@ -19,4 +23,16 @@ def recommend(a):
     routine={'starting':'Build the basics before adding extras.', 'basic':'Keep the products that already work for you; you do not need to replace your whole routine.', 'actives':'Avoid adding several active products at once. If your routine is irritating, ask a dermatologist for help simplifying it.', 'prescribed':'Keep following your prescribed plan and ask your prescriber before adding products.'}[a['routine']]
     patches=a['concern']=='spots' and a['sensitivity']=='comfortable' and a['routine']!='actives' and not care
     product={'name':'Pimple Rescue Patches','path':'/products/pimple-rescue-patch','image':'dl-patch-real-creator.jpg?v=1789329677','product_why':'An optional hydrocolloid cover for an occasional surface spot. It will not treat deep, painful, or persistent acne.'} if patches else {'name':'The Reset Cleanser','path':'/products/the-reset-cleanser','image':'dl-cleanser-sink.jpg?v=1789177321','product_why':'A fragrance-free cleanser option for the cleansing step. Review the ingredients and introduce it gradually; individual tolerance varies.'}
-    return dict(product,key='professional-guidance' if care else a['concern'],title=title,why=why,care=care,steps=[['Cleanse gently','Use a gentle cleanser with your fingertips. Avoid scrubbing, especially when skin is reactive or breaking out.'],['Support moisture',moisturizer],['Protect during the day',spf]],routine_note=routine,shop='https://find-a-derm.aad.org/' if care else 'https://dermilogic.com'+product['path'],shop_label='Find a dermatologist' if care else 'Explore '+product['name'],gap='Moisturizer and sunscreen are separate essentials. We have not verified matching Dermilogic products for those steps, so choose suitable options you already trust.',notice='Seek prompt medical care for rapidly worsening symptoms, significant swelling, or signs of infection.' if care else 'If concerns persist, worsen, or become painful, see a dermatologist. This guide does not diagnose skin conditions or replace medical care.')
+    bundle = []
+    if not care:
+        bundle.append(dict(CATALOG['items']['cleanser'], reason='For the cleansing step. Keep your current cleanser if it already works for you.'))
+        if patches:
+            bundle.append(dict(CATALOG['items']['patches'], reason='An optional cover for occasional surface spots, not treatment for deep or persistent acne.'))
+            if a['routine']=='starting':
+                bundle.append(dict(CATALOG['items']['towels'], reason='An optional fresh towel for gently patting dry. A clean reusable towel is also fine.'))
+        elif a['concern']=='simple' and a['routine']=='starting':
+            bundle.append(dict(CATALOG['items']['bands'], reason='A convenience extra to keep water off your wrists while you wash.'))
+        else:
+            bundle.append(dict(CATALOG['items']['towels'], reason='An optional fresh towel for gently patting dry. It is a convenience item, not a skin treatment.'))
+    bundle_name='Your blemish-care bundle' if patches else 'Your gentle-care bundle' if a['sensitivity']=='reactive' else 'Your simple-start bundle' if a['concern']=='simple' else 'Your daily-care bundle'
+    return dict(product,bundle=bundle,bundle_name=bundle_name,catalog_checked_at=CATALOG['checked_at'],key='professional-guidance' if care else a['concern'],title=title,why=why,care=care,steps=[['Cleanse gently','Use a gentle cleanser with your fingertips. Avoid scrubbing, especially when skin is reactive or breaking out.'],['Support moisture',moisturizer],['Protect during the day',spf]],routine_note=routine,shop='https://find-a-derm.aad.org/' if care else 'https://dermilogic.com'+product['path'],shop_label='Find a dermatologist' if care else 'Explore '+product['name'],gap='Moisturizer and sunscreen are separate essentials. We have not verified matching Dermilogic products for those steps, so choose suitable options you already trust.',notice='Seek prompt medical care for rapidly worsening symptoms, significant swelling, or signs of infection.' if care else 'If concerns persist, worsen, or become painful, see a dermatologist. This guide does not diagnose skin conditions or replace medical care.')

@@ -21,7 +21,7 @@ This is a section package, not an entire Shopify theme. Never push this director
 
 1. Give Claude Code this folder and `CLAUDE-CODE-PROMPT.md`. Confirm the exact Dermilogic `.myshopify.com` store and an **unpublished** duplicate theme ID. Production store access is not included in this package.
 2. Pull or use a complete local copy of that unpublished theme. Back it up or commit its current state. Copy only the four files listed above; merge an existing matching template rather than replacing it. Run Theme Check on the complete theme.
-3. Use the theme editor to add **Dermilogic skincare quiz** to a page template, or use the provided `page.skin-quiz` template. Set the heading, introduction, CTA, lifestyle image, cleanser product, patch product, and corresponding explanations. Product pickers must select actual available store products; absent/unavailable selections hide purchase links.
+3. Use the theme editor to add **Dermilogic skincare quiz** to a page template, or use the provided `page.skin-quiz` template. Set the heading, introduction, CTA, lifestyle image, cleanser, patches, optional facial towels, optional wash bands, and product explanations. Product pickers must select actual available store products; absent/unavailable selections hide purchase links.
 4. Test the unpublished-theme preview on iPad and desktop. Verify all five questions, Back, Restart, sensitive-skin routing, missing/sold-out products, and professional-guidance paths. Keep email signup off until its copy and store behavior are confirmed.
 5. When authorized, enable the native newsletter form and verify one consenting test signup in Shopify Customers, including the store's double-opt-in behavior if configured. Confirm an actual welcome email flow separately. Get explicit approval for the exact live theme before publication.
 
@@ -66,3 +66,24 @@ Sources checked September 25, 2026:
 The package can be validated locally, but actual Shopify theme rendering, native signup, CAPTCHA, double opt-in, app compatibility, and customer records require testing against the confirmed unpublished theme. No Shopify store or live theme was modified during this build.
 
 Rollback on a draft: remove the section from the template in the theme editor, or restore the backed-up files. Leave unrelated theme changes intact. Any live-theme rollback also requires the approved target and release process.
+
+## Automatic progression and dynamic bundles
+
+Selecting an answer advances after a short 350 ms pause. Back cancels a pending advance; reselecting an existing answer also advances. Continue remains as a keyboard/manual fallback and a retry after a failed recommendation request. Late results are ignored if the shopper has gone back. Results retain the same no-email option.
+
+Bundle rules in `skincare.py`:
+
+| Answer pattern | Suggested items |
+| --- | --- |
+| Occasional spots, comfortable skin, no active-treatment routine | Cleanser + patches; add optional towels if starting from scratch |
+| Simple routine, starting from scratch | Cleanser + optional wash bands |
+| Other non-escalation paths, including reactive skin | Cleanser + optional towels |
+| Painful/persistent breakouts, current irritation, prescribed routine | No bundle or add-to-cart action |
+
+Shoppers can uncheck any item. Bundles are groups of one-time individual products, not Shopify bundle SKUs or a discount promotion. There is no automatic discount or subscription. Each item displays its selected variant label; the theme chooses the selected or first available variant from the configured product. Products requiring a selling plan are not eligible. Repeated variant IDs are deduplicated. Do not configure the same product for multiple categories.
+
+On Shopify, the selected products, images, prices and availability come from Liquid in the current market currency. The subtotal updates when items are toggled. The add-to-cart button sends only selected variant IDs and quantity 1 to the locale-aware Shopify Ajax cart endpoint, then opens the cart. It does not send skin answers, tags, notes, or line-item properties. Missing, unavailable, and subscription-only items cannot be selected. The cart confirms final price and inventory; errors are shown and are not retried automatically.
+
+The Netlify/local demo reads a public-catalog snapshot in `catalog.json`, with its check timestamp. Its button opens the selected variants in the real store cart via a cart permalink with `storefront=true`; it does not claim to add to a local fake cart. Preview prices can age; refresh the public catalog snapshot before a new campaign review. No skin-answer parameters are included in the cart link. Shopify does not use those snapshot IDs for cart submission: it resolves the theme-editor selections.
+
+Before launch, verify the real unpublished theme's current-market prices, selected variant labels, empty/partial selection, inventory errors, current cart preservation, cart redirection, and duplicate-click behavior. Tests in this package mock cart responses; no real shopper cart was modified by the tests.
